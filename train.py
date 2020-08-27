@@ -50,15 +50,6 @@ class CornellMovieDialogsDataset(Dataset):
 
         return tokens_ids_tensor, attn_mask, answer_embedding
 
-#Creating instances of training and validation set
-dataset = CornellMovieDialogsDataset(question_text_filepath = 'cornell movie-dialogs corpus/preprocessed_q_train.txt', answer_embedding_dict = answer_embedding_dict, maxlen = 30)
-
-train_set, val_set = torch.utils.data.random_split(dataset, [210000, len(dataset) - 210000])
-
-#Creating intsances of training and validation dataloaders
-train_loader = DataLoader(train_set, batch_size = 256, shuffle = True)
-val_loader = DataLoader(val_set, batch_size = 256, shuffle = True)
-
 class DiscriminativeLoss(_Loss):
 
     def __init__(self):
@@ -73,8 +64,8 @@ class DiscriminativeLoss(_Loss):
             num = nn.MSELoss()(model_output_tensor[i], answer_embedding_tensor[i])
             print(num)
             den = nn.MSELoss()((model_output_tensor[i]).repeat(1,total_len).view(-1, dim), all_answer_embeddings)
-            # print(den)
-            total_loss += den
+
+            total_loss += num/den
         return total_loss
 
 class ResponseSelector(nn.Module):
@@ -114,15 +105,11 @@ class ResponseSelector(nn.Module):
 
         return answer_vec
 
-# Commented out IPython magic to ensure Python compatibility.
-model = ResponseSelector(freeze_bert = True).cuda()
-objf = (nn.MSELoss()).cuda()
-optimizer = optim.Adam(model.parameters(),'lr'==0.01)
-
-print("Model, objf, optimizer initialised")
-
+    
 def train_model(train_dataloader, val_dataloader, training = True, epochs=20):
     old_val_loss = 1000000.0
+    print("Start training")
+    
     for epoch in range(epochs):
         model.train()
         loss = 0
@@ -160,8 +147,24 @@ def train_model(train_dataloader, val_dataloader, training = True, epochs=20):
             torch.save(model.state_dict(), "best-model.pt")
             old_val_loss = val_loss
 
-print("Start training")
+
 
 if __name__ == "__main__":
-    train_model(train_loader, val_loader, epochs = opt.n_epochs)
+    
+    #Creating instances of training and validation set
+    dataset = CornellMovieDialogsDataset(question_text_filepath = 'cornell movie-dialogs corpus/preprocessed_q_train.txt', answer_embedding_dict = answer_embedding_dict, maxlen = 30)
+    
+    #Setting aside a validation split for validating the model after every epoch
+    train_set, val_set = torch.utils.data.random_split(dataset, [210000, len(dataset) - 210000])
 
+    #Creating intsances of training and validation dataloaders
+    train_loader = DataLoader(train_set, batch_size = 256, shuffle = True)
+    val_loader = DataLoader(val_set, batch_size = 256, shuffle = True)
+
+    model = ResponseSelector(freeze_bert = True).cuda()
+    objf = (nn.MSELoss()).cuda()
+    optimizer = optim.Adam(model.parameters(),'lr'==0.01)
+    
+    print("Model, objf, optimizer initialised")
+    
+    train_model(train_loader, val_loader, epochs = opt.n_epochs)
