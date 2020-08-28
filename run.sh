@@ -4,7 +4,6 @@
 preprocess=1               #set to 1 if data processing needed
 encode_data=1              #set to 1 if embeddings are not already created and saved
 run_question_answering=1   #set to 1 to converse with the model
-run_eval=0                 #set to 1 to run evaluation
 
 question_beam=50 #number of <question, answer> pairs to be searched
 
@@ -61,12 +60,3 @@ python3 converse.py --beam=$question_beam
 
 fi
 
-if [ $run_eval -eq 1 ]; then
-printf "\n"
-echo ============================================================================
-echo "                         Cosine Similarity Test                           "
-echo ============================================================================
-
-python3 eval.py --beam=$question_beam
-
-fi
