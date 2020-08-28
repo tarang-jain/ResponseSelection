@@ -132,7 +132,9 @@ print("\nWriting preprocessed lines to new file...")
 with open(preprocessed_qa_file, 'w', encoding='utf-8') as qa_file:
     with open(preprocessed_q_file, 'w', encoding='utf-8') as q_file:
         for i in range(len(pairs)):
-            q_file.write("[CLS] " + pairs[i][0] + "\n")
-            qa_file.write("[CLS] " + " [SEP] ".join(pairs[i]) + "\n")
+            if len(pairs[i]) == 2:
+                q_file.write("[CLS] " + pairs[i][0] + " [SEP]\n")
+                qa_file.write("[CLS] " + " [SEP] ".join(pairs[i]) + " [SEP]\n")
 
 print("\nPREPROCESSING DONE ...")
+
