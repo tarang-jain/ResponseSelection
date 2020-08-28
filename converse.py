@@ -1,9 +1,9 @@
+from bert_serving.client import BertClient
 import os
 import pickle
 import numpy as np
 import tqdm
 import ngtpy
-from bert_serving.client import BertClient
 import re
 import argparse
 # from preprocess import normalizeString
@@ -22,10 +22,8 @@ qa_embedding_file = os.path.join("embeddings_qa.pkl")
 bc = BertClient(check_length = False)
 f = open(q_embedding_file, "rb+")
 all_question_embedding = list((pickle.load(f)).values())
-f.close()
 f = open(qa_embedding_file, "rb+")
 all_question_answer_embedding = list((pickle.load(f)).values())
-f.close()
 
 ngtpy.create(b"questions_index", len(all_question_embedding[0]))
 index = ngtpy.Index(b"questions_index")
@@ -40,15 +38,17 @@ def normalizeString(s):
     return s
 
 QA = open(qa_file, "r").readlines()
+
 while(True):
     query = input("user-input>>> ")
-    query = ["CLS " + normalizeString(query)]
+    query = ["[CLS] " + normalizeString(query)]
     query_embedding = list(bc.encode(query))
     result = index.search(query_embedding, opt.beam)
     answers = []
     distances = []
     for i, o in enumerate(result):
         answer = (QA[int(str(o[0]))].split(" [SEP] "))[1]
+        answer = answer.strip("[SEP]")
         answers.append(answer)
         query_answer_pair = [query[0] + " [SEP] " + answer]
         distances.append(np.linalg.norm(bc.encode(query_answer_pair) - all_question_answer_embedding[int(str(o[0]))]))
