@@ -8,9 +8,8 @@ run_question_answering=1   #set to 1 to converse with the model
 question_beam=50 #number of <question, answer> pairs to be searched
 
 printf "\n"
-echo "Starting bert service in new terminal window ..."
 
-#If encode_data=1, you will need to first start the bert service
+#First start the bert service in new terminal window
 
 if [ $preprocess -eq 1 ]; then
 printf "\n"
