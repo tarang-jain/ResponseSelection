@@ -9,3 +9,5 @@ To run it from start to end, run bert-as-service in a new terminal. Go to the qu
 ## Approach 2: Fine-tuning of BERT transformer models
 
 This approach was makes use of the [transformers](https://github.com/huggingface/transformers) library for fine-tuning BERT pre-trained models in PyTorch and is implemented with the objective of producing responses that are predicated on the entire conversation and not just the immediate previous utterance in a conversation. 
+
+To run it from start to end, run bert-as-service in a new terminal. Go to the question beam directory `cd BERT_fine_tune`. All the flags in run.sh should be set to 1. Then run `./run.sh`. This will preprocess the corpus and create files of embedding vectors using bert-as-service. This is followed by training the neural network. The neural network training (bert fine-tuning) script is train.py. A GPU is needed to run the training process.After the neural network is trained, one can converse with the system. This is done through converse.py.
