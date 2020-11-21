@@ -6,3 +6,6 @@ This repository consists of the work done during my internship at Sony Corporati
 
 To run it from start to end, run bert-as-service in a new terminal. Go to the question beam directory `cd BERT_question_beam`. All the flags in run.sh should be set to 1. Then run `./run.sh`. This will preprocess the corpus, create files of embedding vectors using bert-as-service and run the question answering system. Evaluation is done by setting aside 5000 <question, answer> pairs as the evaluation set. Evaluation questions are passed as input and the cosine similarity between the true response from the eval set and the response obtained from the model is calculated. 
 
+## Approach 2: Fine-tuning of BERT transformer models
+
+This approach was makes use of the [transformers](https://github.com/huggingface/transformers) library for fine-tuning BERT pre-trained models in PyTorch and is implemented with the objective of producing responses that are predicated on the entire conversation and not just the immediate previous utterance in a conversation. 
